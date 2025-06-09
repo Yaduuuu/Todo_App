@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+    <title>To-Do List</title>
+    <style>
+        body {
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            justify-content: center;
+
+            background-image: url("#{resource['img/back_to_do.png']}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+
+        .center-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #ccc;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 250px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"],
+        input[type="button"] {
+            padding: 8px 12px;
+            margin: 5px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover,
+        input[type="button"]:hover {
+            background-color: #2980b9;
+        }
+
+        input[value="Mark as Completed"] {
+            background-color: #008000;
+        }
+
+        input[value="Mark as Incomplete"] {
+            background-color: #FF0000;
+        }
+
+        .completed-task {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+    </style>
+</h:head>
+
+<h:body>
+    <div class="center-container">
+        <h:form>
+            <h2>To-Do App</h2>
+            <hr/>
+
+            <h:panelGroup layout="block" style="margin-bottom: 10px;">
+                <h:outputLabel for="taskInput" value="Task: "/>
+                <h:inputText id="taskInput" value="#{taskbean.newTask}"/>
+                <h:commandButton value="Add" action="#{taskbean.addTask}"/>
+            </h:panelGroup>
+
+            <hr/>
+
+            <h:panelGroup layout="block" style="margin-bottom: 20px;">
+                <h3 style="margin: 0; display: inline;">Your Tasks:</h3>
+                <h:commandButton value="Clear All" action="#{taskbean.clearTasks}" style="margin-left: 10px;"/>
+            </h:panelGroup>
+
+            <h3>Pending Tasks:</h3>
+            <ui:repeat value="#{taskbean.tasks}" var="task" varStatus="i">
+                <h:panelGroup rendered="#{!task.completed}">
+                    <h:panelGrid columns="5" style="margin-bottom:10px;">
+                        <h:panelGroup rendered="#{taskbean.editingIndex == i.index}">
+                            <h:outputText value="#{i.index + 1}. "/>
+                            <h:inputText value="#{taskbean.editValue}"/>
+                            <h:commandButton value="Save" action="#{taskbean.saveEdit}"/>
+                            <h:commandButton value="Cancel" action="#{taskbean.cancelEdit}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{taskbean.editingIndex != i.index}">
+                            <h:outputText value="#{i.index + 1}. #{task.name}"/>
+                            <h:commandButton value="Edit"
+                                             action="#{taskbean.startEdit(i.index)}"
+                                             rendered="#{!task.completed}"/>
+                            <h:commandButton value="Delete" action="#{taskbean.deleteTask(i.index)}"/>
+                            <h:commandButton value="Mark as Completed"
+                                             action="#{taskbean.toggleTaskCompletion(i.index)}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:panelGroup>
+            </ui:repeat>
+
+            <hr/>
+            //2 list will fix index
+            <h3>Completed Tasks:</h3>
+            <ui:repeat value="#{taskbean.tasks}" var="task" varStatus="i">
+                <h:panelGroup rendered="#{task.completed}">
+                    <h:panelGrid columns="4" style="margin-bottom:10px;">
+                        <h:outputText value="#{i.index + 1}. #{task.name}" styleClass="completed-task"/>
+                        <h:commandButton value="Delete" action="#{taskbean.deleteTask(i.index)}"/>
+                        <h:commandButton value="Mark as Incomplete"
+                                         action="#{taskbean.toggleTaskCompletion(i.index)}"/>
+                    </h:panelGrid>
+                </h:panelGroup>
+            </ui:repeat>
+
+        </h:form>
+    </div>
+</h:body>
+</html>

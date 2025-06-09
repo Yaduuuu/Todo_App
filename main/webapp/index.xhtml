@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+    <title>To-Do List</title>
+    <style>
+        body {
+            background-image: url("#{resource['img/back_to_do.png']}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .center-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: rgba(255, 230, 230, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+
+        h2, h3 {
+            color: #2c3e50;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 250px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"],
+        input[type="button"] {
+            padding: 8px 12px;
+            margin: 5px 2px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[value="Mark as Completed"] {
+            background-color: #008000;
+        }
+
+        input[value="Mark as Incomplete"] {
+            background-color: #FF0000;
+        }
+
+        .completed-task {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="center-container">
+
+        <h:form>
+            <h2>To-Do App</h2>
+            <hr/>
+        </h:form>
+
+        <h:form>
+            <h:outputLabel for="taskInput" value="Task: "/>
+            <h:inputText id="taskInput" value="#{taskBean.newTask}"/>
+            <h:commandButton value="Add" action="#{taskBean.addTask}"/>
+        </h:form>
+
+        <hr/>
+        <h:form>
+            <h3 style="display: inline;">Your Tasks:</h3>
+            <h:commandButton value="Clear All" action="#{taskBean.clearTasks}" style="margin-left: 10px;"/>
+        </h:form>
+
+        <!--This is for Pending Tasks -->
+        <h:form>
+            <h3>Pending Tasks:</h3>
+            <ui:repeat value="#{taskBean.tasksPending}" var="task" varStatus="i">
+                <h:panelGrid columns="2" style="width: 100%; margin-bottom: 10px; align-items: center;" columnClasses="taskCol,btnCol">
+
+                    <!-- Column 1: Serial number + task name or input -->
+                    <h:panelGroup>
+                        <h:outputText value="#{i.index + 1}. " style="font-weight: bold;" />
+                        <h:panelGroup rendered="#{taskBean.editingTaskId == task.id}">
+                            <h:inputText value="#{taskBean.editValue}" style="width: 250px;" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{taskBean.editingTaskId != task.id}">
+                            <h:outputText value="#{task.name}" />
+                        </h:panelGroup>
+                    </h:panelGroup>
+
+                    <!-- Column 2:  For Buttons -->
+                    <h:panelGroup>
+                        <h:panelGroup rendered="#{taskBean.editingTaskId == task.id}">
+                            <h:commandButton value="Save" action="#{taskBean.saveEdit}"  />
+                            <h:commandButton value="Cancel" action="#{taskBean.cancelEdit}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{taskBean.editingTaskId != task.id}">
+                            <h:commandButton value="Edit" action="#{taskBean.startEdit(task.id)}" />
+                            <h:commandButton value="Delete" action="#{taskBean.deleteTask(task.id)}"  />
+                            <h:commandButton value="Mark as Completed" action="#{taskBean.toggleTaskCompletion(task.id)}" />
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </ui:repeat>
+        </h:form>
+
+
+
+        <!-- Completed Tasks -->
+        <h:form>
+            <h3>Completed Tasks:</h3>
+            <ui:repeat value="#{taskBean.tasksCompleted}" var="task" varStatus="i">
+                <h:panelGrid columns="2" style="margin-bottom: 10px; width: 100%;" columnClasses="leftCol,rightCol">
+
+                    <!-- Serial number + name -->
+                    <h:outputText value="#{i.index + 1}. #{task.name}" styleClass="completed-task"/>
+
+                    <!-- Buttons -->
+                    <h:panelGroup>
+                        <h:commandButton value="Delete" action="#{taskBean.deleteTask(task.id)}"/>
+                        <h:commandButton value="Mark as Incomplete" action="#{taskBean.toggleTaskCompletion(task.id)}"
+                                        />
+                    </h:panelGroup>
+                </h:panelGrid>
+            </ui:repeat>
+        </h:form>
+
+
+    </div>
+</h:body>
+</html>
